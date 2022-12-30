@@ -1,4 +1,4 @@
-const net = require('net')
+const dgram = require('dgram')
 
 const readLine = require('readline').createInterface({
 	input: process.stdin,
@@ -12,37 +12,38 @@ const waitForUserName = new Promise(resolve => {
 })
 
 waitForUserName.then((username) => {
-	const socket = net.connect({
-        port: 4000
+	const client = socket.connect({
+        port: 41234,
+        address: '127.0.0.1'
     });
 
 	readLine.on('line', data => {
 		if (data === 'quit'){
-			socket.write(`${username} saiu do chat!`)
-			socket.setTimeout(1000);
+			client.write(`${username} saiu do chat!`)
+			client.setTimeout(1000);
 		}else{
-			socket.write(username + ': ' + data)
+			client.write(username + ': ' + data)
 		}
 	})
 
-	socket.on('connect', () => {
-		socket.write(username + ' se juntou ao chat!')
+	client.on('connect', () => {
+		client.write(username + ' se juntou ao chat!')
 	})
 
-	socket.on('data', data => {
+	client.on('data', data => {
 		console.log('\x1b[33m%s\x1b[0m', data)
 	})
 
-	socket.on('timeout', () => {
-		socket.write('quit');
-		socket.end()
+	client.on('timeout', () => {
+		client.write('quit');
+		client.end()
 	})
 
-	socket.on('end', () => {
+	client.on('end', () => {
 		process.exit()
 	})
 
-	socket.on('error', () => {
+	client.on('error', () => {
 		console.log('Parece que o servidor caiu...')
 	})
 })

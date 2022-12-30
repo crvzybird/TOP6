@@ -1,7 +1,7 @@
-const net = require('net')
+const dgram = require('dgram')
 let sockets = [];
 
-const sever = net.createServer(socket => {
+const sever = dgram.createSocket('udp4', socket => {
 	sockets.push(socket);
 	console.log('alguém chegou!');
 
@@ -18,7 +18,7 @@ const sever = net.createServer(socket => {
 	})
 })
 
-sever.listen(4000)
+sever.bind(8080)
 
 
 function broadcast(message, socketSent) {
